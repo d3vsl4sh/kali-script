@@ -1013,67 +1013,69 @@ git config --global push.default simple
 
 # ##### Setup firefox's plugins
  (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}firefox's plugins${RESET} ~ useful addons"
+
+#install extensions
+EXTENSIONS_SYSTEM='/usr/share/mozilla/extensions/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}/'
+EXTENSIONS_USER=`echo ~/.mozilla/firefox/*.default/extensions/`
+
+# -------------------------- xpi tools ---------------------------------
+
+get_addon_id_from_xpi () { #path to .xpi file
+    addon_id=`unzip -p $1 manifest.json | jq '.applications.gecko.id' | xargs`
+    echo $addon_id 
+}
+
+# Installs .xpi given by relative path
+# to the extensions path given
+install_addon () {
+    xpi=$1
+    extensions_path=$2
+    new_filename=`get_addon_id_from_xpi $xpi`.xpi
+    new_filepath="${extensions_path}${new_filename}"
+    if [ -f "$new_filepath" ]; then
+        echo "File already exists: $new_filepath"
+        echo "Skipping installation for addon $new_filename."
+    else
+        cp "$xpi" "$new_filepath"
+    fi
+}
+    
+ mextensions=(
+     1676320    #Cookie Quick Manager
+     969185     #FoxyProxy Standard
+     1741014    #User Agent Switcher
+     1669416    #HTTPS Everywhere
+     1126650    #Live HTTP Headers
+     ) #mozilla store extensions
+ 
+ eextensions=(
+        #https:\\foo.bar\extension1
+     ) #external extenions
+
  #--- Configure firefox
  export DISPLAY=:0.0
  #--- Download extensions
- ffpath="$(find ~/.mozilla/firefox/*.default*/ -maxdepth 0 -mindepth 0 -type d -name '*.default*' -print -quit)/extensions"
- [ "${ffpath}" == "/extensions" ] \
-   && echo -e ' '${RED}'[!]'${RESET}" Couldn't find Firefox folder" 1>&2
- mkdir -p "${ffpath}/"
- #--- Cookies Manager+
- echo -n '[2/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1121248" \
-   -o "${ffpath}/cookie-manager@robwu.nl.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Cookies Manager+'" 1>&2
-# #--- FoxyProxy Basic
- echo -n '[4/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/969185" \
-   -o "${ffpath}/foxyproxy-standard@eric.h.jung.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'FoxyProxy Basic'" 1>&2
-# #--- User Agent Overrider
- echo -n '[5/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1741014" \
-   -o "${ffpath}/user-agent-switcher@ninetailed.ninja.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'User Agent Overrider'" 1>&2
-# #--- HTTPS Everywhere
- echo -n '[6/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1669416" \
-   -o "${ffpath}/https-everywhere@eff.org.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HTTPS Everywhere'" 1>&2
-# #--- Live HTTP Headers
- echo -n '[7/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1126650" \
-   -o "${ffpath}/{ed102056-8b4f-43a9-99cd-6d1b25abe87e}.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Live HTTP Headers'" 1>&2
-# #---Tamper Data
- echo -n '[8/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1081527" \
-   -o "${ffpath}/{2bd18ca8-5dd7-4311-a777-02ed29663496}.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Tamper Data'" 1>&2# #--- Disable Add-on Compatibility Checks
+ tmppath="/tmp/ffextensions"
+ mkdir -p "${tmppath}/"
 
-# #--- Installing extensions
- for FILE in $(find "${ffpath}" -maxdepth 1 -type f -name '*.xpi'); do
-   d="$(basename "${FILE}" .xpi)"
-   mkdir -p "${ffpath}/${d}/"
-   unzip -q -o -d "${ffpath}/${d}/" "${FILE}"
-   rm -f "${FILE}"
- done
+for extension in "${mextensions[@]}"
+do
+timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/${extension}" \
+   -o "${tmppath}/${extension}.xpi"
+install_addon "${tmppath}/${extension}.xpi" "$EXTENSIONS_USER"
+done
+
 # #--- Enable Firefox's addons/plugins/extensions
- timeout 15 firefox >/dev/null 2>&1
- timeout 5 killall -9 -q -w firefox-esr >/dev/null
- sleep 3s
-# #--- Method #1 (Works on older versions)
- file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.sqlite' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
- if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
-   echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #1 - extensions.sqlite)"
-   apt -y -qq install sqlite3 \
-     || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-   rm -f /tmp/firefox.sql
-   touch /tmp/firefox.sql
-   echo "UPDATE 'main'.'addon' SET 'active' = 1, 'userDisabled' = 0;" > /tmp/firefox.sql    # Force them all!
-   sqlite3 "${file}" < /tmp/firefox.sql      #fuser extensions.sqlite
- fi
-# #--- Method #2 (Newer versions)
- file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.json' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
- if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
-   echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #2 - extensions.json)"
-   sed -i 's/"active":false,/"active":true,/g' "${file}"                # Force them all!
-   sed -i 's/"userDisabled":true,/"userDisabled":false,/g' "${file}"    # Force them all!
- fi
+timeout 15 firefox >/dev/null 2>&1
+timeout 5 killall -9 -q -w firefox-esr >/dev/null
+sleep 3s
+
+file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.json' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
+if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
+  echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #2 - extensions.json)"
+  sed -i 's/"active":false,/"active":true,/g' "${file}"                # Force them all!
+  sed -i 's/"userDisabled":true,/"userDisabled":false,/g' "${file}"    # Force them all!
+fi
 # #--- Remove cache
  file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'prefs.js' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
  [ -n "${file}" ] \
