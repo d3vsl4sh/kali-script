@@ -1285,6 +1285,9 @@ if [ -e /tmp/microsoft.asc ]; then
   apt -y -qq install apt-transport-https
   apt update
   apt -y -qq install code
+  /usr/bin/code --install-extension ms-python.python --force --user-data-dir="~/.vscode-root"
+  /usr/bin/code --install-extension eamodio.gitlens --force --user-data-dir="~/.vscode-root"
+  /usr/bin/code --install-extension Shan.code-settings-sync --force --user-data-dir="~/.vscode-root"  
 fi
 
 ##### Install wdiff
