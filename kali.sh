@@ -150,13 +150,13 @@ export TERM=xterm
 
 
 ##### Are we using GNOME?
-#if [[ $(which gnome-shell) ]]; then
-# ##### RAM check
-#  if [[ "$(free -m | grep -i Mem | awk '{print $2}')" < 2048 ]]; then
-#    echo -e '\n '${RED}'[!]'${RESET}" ${RED}You have <= 2GB of RAM and using GNOME${RESET}" 1>&2
-#    echo -e " ${YELLOW}[i]${RESET} ${YELLOW}Might want to use XFCE instead${RESET}..."
-#    sleep 15s
-#  fi
+if [[ $(which gnome-shell) ]]; then
+ ##### RAM check
+  if [[ "$(free -m | grep -i Mem | awk '{print $2}')" < 2048 ]]; then
+    echo -e '\n '${RED}'[!]'${RESET}" ${RED}You have <= 2GB of RAM and using GNOME${RESET}" 1>&2
+    echo -e " ${YELLOW}[i]${RESET} ${YELLOW}Might want to use XFCE instead${RESET}..."
+    sleep 15s
+  fi
 
 
   ##### Disable its auto notification package updater
@@ -1020,56 +1020,31 @@ git config --global push.default simple
  [ "${ffpath}" == "/extensions" ] \
    && echo -e ' '${RED}'[!]'${RESET}" Couldn't find Firefox folder" 1>&2
  mkdir -p "${ffpath}/"
-# #--- plug-n-hack
-# #curl --progress -k -L -f "https://github.com/mozmark/ringleader/blob/master/fx_pnh.xpi?raw=true????????????????"  \
-# #  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'plug-n-hack' 1>&2
-# #--- HttpFox
-# #curl --progress -k -L -f "https://addons.mozilla.org/en-GB/firefox/addon/httpfox/??????????????"  \
-# #  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HttpFox' 1>&2
-# #--- SQLite Manager
- echo -n '[1/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/5817/addon-5817-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/SQLiteManager@mrinalkant.blogspot.com.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'SQLite Manager'" 1>&2
  #--- Cookies Manager+
- echo -n '[2/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/92079/addon-92079-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/{bb6bc1bb-f824-4702-90cd-35e2fb24f25d}.xpi" \
+ echo -n '[2/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1121248" \
+   -o "${ffpath}/cookie-manager@robwu.nl.xpi" \
      || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Cookies Manager+'" 1>&2
-#--- Firebug
- echo -n '[3/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/1843/addon-1843-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/firebug@software.joehewitt.com.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Firebug'" 1>&2
 # #--- FoxyProxy Basic
- echo -n '[4/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/15023/addon-15023-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/foxyproxy-basic@eric.h.jung.xpi" \
+ echo -n '[4/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/969185" \
+   -o "${ffpath}/foxyproxy-standard@eric.h.jung.xpi" \
      || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'FoxyProxy Basic'" 1>&2
 # #--- User Agent Overrider
- echo -n '[5/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/429678/addon-429678-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/useragentoverrider@qixinglu.com.xpi" \
+ echo -n '[5/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1741014" \
+   -o "${ffpath}/user-agent-switcher@ninetailed.ninja.xpi" \
      || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'User Agent Overrider'" 1>&2
 # #--- HTTPS Everywhere
- echo -n '[6/11]'; timeout 300 curl --progress -k -L -f "https://www.eff.org/files/https-everywhere-latest.xpi" \
+ echo -n '[6/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1669416" \
    -o "${ffpath}/https-everywhere@eff.org.xpi" \
      || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HTTPS Everywhere'" 1>&2
 # #--- Live HTTP Headers
- echo -n '[7/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/3829/addon-3829-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/{8f8fe09b-0bd3-4470-bc1b-8cad42b8203a}.xpi" \
+ echo -n '[7/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1126650" \
+   -o "${ffpath}/{ed102056-8b4f-43a9-99cd-6d1b25abe87e}.xpi" \
      || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Live HTTP Headers'" 1>&2
 # #---Tamper Data
- echo -n '[8/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/966/addon-966-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/{9c51bd27-6ed8-4000-a2bf-36cb95c0c947}.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Tamper Data'" 1>&2
-# #--- Disable Add-on Compatibility Checks
-# echo -n '[9/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/300254/addon-300254-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/check-compatibility@dactyl.googlecode.com.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Disable Add-on Compatibility Checks'" 1>&2
-# #--- Disable HackBar
-# echo -n '[10/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/3899/addon-3899-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/{F5DDF39C-9293-4d5e-9AA8-E04E6DD5E9B4}.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HackBar'" 1>&2
-# #--- uBlock
-# echo -n '[11/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/607454/addon-607454-latest.xpi?src=dp-btn-primary" \
-   -o "${ffpath}/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}.xpi" \
-     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'uBlock'" 1>&2
+ echo -n '[8/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/file/1081527" \
+   -o "${ffpath}/{2bd18ca8-5dd7-4311-a777-02ed29663496}.xpi" \
+     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Tamper Data'" 1>&2# #--- Disable Add-on Compatibility Checks
+
 # #--- Installing extensions
  for FILE in $(find "${ffpath}" -maxdepth 1 -type f -name '*.xpi'); do
    d="$(basename "${FILE}" .xpi)"
@@ -1083,15 +1058,15 @@ git config --global push.default simple
  sleep 3s
 # #--- Method #1 (Works on older versions)
  file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.sqlite' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
-# if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
-  # echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #1 - extensions.sqlite)"
-  # apt -y -qq install sqlite3 \
-    # || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-  # rm -f /tmp/firefox.sql
-  # touch /tmp/firefox.sql
-  # echo "UPDATE 'main'.'addon' SET 'active' = 1, 'userDisabled' = 0;" > /tmp/firefox.sql    # Force them all!
-  # sqlite3 "${file}" < /tmp/firefox.sql      #fuser extensions.sqlite
-# fi
+ if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
+   echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #1 - extensions.sqlite)"
+   apt -y -qq install sqlite3 \
+     || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+   rm -f /tmp/firefox.sql
+   touch /tmp/firefox.sql
+   echo "UPDATE 'main'.'addon' SET 'active' = 1, 'userDisabled' = 0;" > /tmp/firefox.sql    # Force them all!
+   sqlite3 "${file}" < /tmp/firefox.sql      #fuser extensions.sqlite
+ fi
 # #--- Method #2 (Newer versions)
  file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.json' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
  if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
@@ -2770,7 +2745,7 @@ apt -y -qq install openssh-server \
 rm -f /etc/ssh/ssh_host_*
 find ~/.ssh/ -type f ! -name authorized_keys -delete 2>/dev/null
 #--- Generate new keys
-ssh-keygen -b 4096 -t rsa1 -f /etc/ssh/ssh_host_key -P "" >/dev/null
+ssh-keygen -b 4096 -t rsa -f /etc/ssh/ssh_host_key -P "" >/dev/null
 ssh-keygen -b 4096 -t rsa -f /etc/ssh/ssh_host_rsa_key -P "" >/dev/null
 ssh-keygen -b 1024 -t dsa -f /etc/ssh/ssh_host_dsa_key -P "" >/dev/null
 ssh-keygen -b 521 -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -P "" >/dev/null
