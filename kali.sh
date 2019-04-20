@@ -1262,18 +1262,6 @@ for plugin in modelines sort externaltools docinfo filebrowser quickopen time sp
 done
 
 
-##### Install PyCharm (Community Edition)
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}PyCharm (Community Edition)${RESET} ~ Python IDE"
-timeout 300 curl --progress -k -L -f "https://download.jetbrains.com/python/pycharm-community-2017.2.4.tar.gz" > /tmp/pycharm-community.tar.gz \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading pycharm-community.tar.gz" 1>&2       #***!!! hardcoded version!
-if [ -e /tmp/pycharm-community.tar.gz ]; then
-  tar -xf /tmp/pycharm-community.tar.gz -C /tmp/
-  rm -rf /opt/pycharm/
-  mv -f /tmp/pycharm-community-*/ /opt/pycharm
-  mkdir -p /usr/local/bin/
-  ln -sf /opt/pycharm/bin/pycharm.sh /usr/local/bin/pycharm
-fi
-
 ##### Install Visual Studio Code
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Visual Studio Code ${RESET} ~ IDE"
 timeout 300 curl --progress -k -L -f https://packages.microsoft.com/keys/microsoft.asc > /tmp/microsoft.asc \
