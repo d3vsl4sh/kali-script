@@ -1455,9 +1455,9 @@ chmod +x "${file}"
 curl -s -L https://asciinema.org/install | sh
 
 
-##### Install shutter
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}shutter${RESET} ~ GUI static screen capture"
-apt -y -qq install shutter \
+##### Install tilix
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}tilix${RESET} ~ Multi Terminal"
+apt -y -qq install tilix \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 
@@ -2765,6 +2765,12 @@ grep -q '^## ssh' "${file}" 2>/dev/null \
   || echo -e '## ssh\nalias ssh-start="systemctl restart ssh"\nalias ssh-stop="systemctl stop ssh"\n' >> "${file}"
 #--- Apply new alias
 source "${file}" || source ~/.zshrc
+
+
+#--- Set Dash favourites
+
+gsettings set org.gnome.shell favorite-apps ['org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'kali-burpsuite.desktop', 'cherrytree.desktop', 'code.desktop', 'com.gexperts.Tilix.desktop']
+
 
 
 
