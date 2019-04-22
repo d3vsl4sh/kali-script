@@ -1267,6 +1267,19 @@ if [ -e /tmp/microsoft.asc ]; then
   /usr/bin/code --install-extension Shan.code-settings-sync --force --user-data-dir="~/.vscode-root"  
 fi
 
+
+##### Install Ghidra
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Ghidra 9.0.2${RESET} ~ SRE suite"
+timeout 300 curl --progress -k -L -f "https://ghidra-sre.org/ghidra_9.0.2_PUBLIC_20190403.zip" > /tmp/ghidra.zip \
+ || echo -e ' '${RED}'[!]'${RESET}" Issue downloading pycharm-community.tar.gz" 1>&2       #***!!! hardcoded version!
+if [ -e /tmp/ghidra.zip ]; then
+ unzip /tmp/ghidra.zip -d /tmp/
+ rm -rf /opt/ghidra/
+ mv -f /tmp/ghidra_*/ /opt/ghidra
+ mkdir -p /usr/local/bin/
+ ln -sf /opt/ghidra/ghidraRun /usr/local/bin/ghidra
+fi
+
 ##### Install wdiff
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}wdiff${RESET} ~ Compares two files word by word"
 apt -y -qq install wdiff wdiff-doc \
